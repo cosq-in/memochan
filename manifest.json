@@ -1,0 +1,18 @@
+{
+    "manifest_version": 3,
+    "name": "MemoChan - Meeting Recorder",
+    "version": "1.0",
+    "description": "Premium browser extension to record meetings and auto-transcribe with Whisper.",
+    "permissions": [
+        "tabCapture",
+        "downloads",
+        "storage",
+        "offscreen"
+    ],
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "background": {
+        "service_worker": "background.js"
+    }
+}

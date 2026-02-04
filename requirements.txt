@@ -1,0 +1,7 @@
+faster-whisper
+pyannote.audio
+torch
+torchaudio
+onnxruntime-gpu
+imageio-ffmpeg
+python-dotenv

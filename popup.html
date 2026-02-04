@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoChan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">🎙️</span>
+                <h1>Memo<span>Chan</span></h1>
+            </div>
+            <p class="status-text" id="status">Ready to capture</p>
+        </header>
+
+        <main>
+            <div class="visualizer-container">
+                <div class="visualizer" id="visualizer">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </div>
+
+            <div class="timer" id="timer">00:00:00</div>
+
+            <div class="controls">
+                <button id="start" class="btn-primary">
+                    <span class="icon">●</span> Start Recording
+                </button>
+                <button id="stop" class="btn-secondary hidden">
+                    <span class="icon">■</span> Stop & Save
+                </button>
+            </div>
+        </main>
+
+        <footer>
+            <p>Auto-transcription ready</p>
+        </footer>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
