@@ -14,7 +14,16 @@ RUN pip install --no-cache-dir \
     faster-whisper \
     pyannote.audio \
     imageio-ffmpeg \
-    requests
+    requests \
+    transformers \
+    accelerate \
+    bitsandbytes
+
+# Pre-download models (Whisper + Phi-3) to speed up container start
+RUN python3 -c "from faster_whisper import WhisperModel; WhisperModel('large-v3', device='cpu')"
+RUN python3 -c "from transformers import AutoModelForCausalLM, AutoTokenizer; \
+    AutoTokenizer.from_pretrained('microsoft/Phi-3-mini-4k-instruct'); \
+    AutoModelForCausalLM.from_pretrained('microsoft/Phi-3-mini-4k-instruct', torch_dtype='auto', trust_remote_code=True)"
 
 # Copy worker script
 COPY worker.py .

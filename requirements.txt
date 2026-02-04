@@ -5,3 +5,6 @@ torchaudio
 onnxruntime-gpu
 imageio-ffmpeg
 python-dotenv
+transformers
+accelerate
+bitsandbytes
