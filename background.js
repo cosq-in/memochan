@@ -13,26 +13,38 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
     }
 
-    // 2. Download Request from Offscreen
-    if (request.action === "DOWNLOAD_CAPTURE") {
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const filename = `meeting-recording-${timestamp}.webm`;
-
-        console.log("Service Worker triggering download:", filename);
-        chrome.downloads.download({
-            url: request.dataUrl,
-            filename: filename,
-            saveAs: false
-        });
-
-        // Close offscreen after download is initiated
-        setTimeout(() => {
-            chrome.offscreen.closeDocument();
-            chrome.storage.local.remove(['recordingState']);
-        }, 2000);
+    // 2. Recording Complete from Offscreen
+    if (request.action === "RECORDING_COMPLETE") {
+        console.log("Recording complete, cleaning up...");
+        cleanupRecording();
     }
 
-    // 3. Popup Commands
+    // 3. Download Blob URL from Offscreen
+    if (request.action === "DOWNLOAD_BLOB_URL") {
+        console.log("Triggering download from Blob URL:", request.url);
+        chrome.downloads.download({
+            url: request.url,
+            filename: request.filename,
+            saveAs: false
+        }, () => {
+            // Signal completion to offscreen (though offscreen closing is the real cleanup)
+            cleanupRecording();
+        });
+    }
+
+    // 4. Keep-alive Heartbeat from Offscreen
+    if (request.action === "HEARTBEAT") {
+        console.debug("Heartbeat received");
+        return true;
+    }
+
+    // 5. Recording Error from Offscreen
+    if (request.action === "RECORDING_FAILED") {
+        console.error("Recording error:", request.error);
+        cleanupRecording();
+    }
+
+    // 6. Popup Commands
     if (request.action === "START_RECORDING") {
         startRecording(request.tabId).then(() => {
             // Save start time and state
@@ -69,8 +81,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const hasOffscreen = contexts.length > 0;
             const state = data.recordingState || {};
 
-            // If storage says recording but no offscreen, it's a stale state -> not recording
-            // If offscreen exists but storage says nothing, we assume recording (recoveyr)
             const isRecording = hasOffscreen && (state.isRecording !== false);
 
             sendResponse({
@@ -78,9 +88,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 startTime: isRecording ? state.startTime : null
             });
         });
-        return true; // Async response
+        return true;
     }
 });
+
+function cleanupRecording() {
+    setTimeout(() => {
+        chrome.offscreen.closeDocument();
+        chrome.storage.local.remove(['recordingState']);
+    }, 2000);
+}
 
 async function startRecording(tabId) {
     const existingContexts = await chrome.runtime.getContexts({
